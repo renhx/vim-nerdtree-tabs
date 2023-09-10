@@ -336,7 +336,12 @@ endfun
 " buffer that's left is the NERDTree buffer
 fun! s:CloseIfOnlyNerdTreeLeft()
   if exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1 && winnr("$") == 1
-    q
+    " HOTFIX: https://github.com/jistr/vim-nerdtree-tabs/issues/102#issuecomment-1643979676
+    call timer_start(1, {-> execute('set belloff=all') })
+    call timer_start(50, {-> execute('q') }) " close buffer after we exit autocmd
+    call timer_start(100, {-> execute('vertical resize 31') }) " window sizing is goofed up, so fix it
+    call timer_start(150, {-> execute('wincmd w') }) " shift focus from NerdTree window to buffer window
+    call timer_start(200, {-> execute('set belloff=') })
   endif
 endfun
 
